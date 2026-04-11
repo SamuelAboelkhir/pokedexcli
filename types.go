@@ -9,7 +9,7 @@ type Config struct {
 	pokeapiClient pokeapi.Client
 	next          *string
 	prev          *string
-	cache         *pokecache.Cache
+	cache         pokecache.Cache
 }
 
 type cliCommand struct {

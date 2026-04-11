@@ -15,7 +15,10 @@ func mapCommand(config *Config) error {
 		data, ok = config.cache.Get(*config.next)
 	}
 	if ok {
-		json.Unmarshal(data, &locations)
+		err := json.Unmarshal(data, &locations)
+		if err != nil {
+			return err
+		}
 	} else {
 		apiData, err := config.pokeapiClient.GetLocations(config.next)
 		if err != nil {
