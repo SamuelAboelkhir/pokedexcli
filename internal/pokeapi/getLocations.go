@@ -2,14 +2,23 @@ package pokeapi
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
 func (c *Client) GetLocations(URL *string) (Locations, error) {
-	url := BaseUrl
+	url := baseUrl
 
 	if URL != nil {
 		url = *URL
+	}
+	if data, ok := c.cache.Get(url); ok {
+		locations := Locations{}
+		err := json.Unmarshal(data, &locations)
+		if err != nil {
+			return Locations{}, err
+		}
+		return locations, nil
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -24,13 +33,17 @@ func (c *Client) GetLocations(URL *string) (Locations, error) {
 
 	defer res.Body.Close()
 
-	decoder := json.NewDecoder(res.Body)
-
-	locations := Locations{}
-
-	if err := decoder.Decode(&locations); err != nil {
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
 		return Locations{}, err
 	}
 
+	locations := Locations{}
+
+	if err := json.Unmarshal(data, &locations); err != nil {
+		return Locations{}, err
+	}
+
+	c.cache.Add(url, data)
 	return locations, nil
 }

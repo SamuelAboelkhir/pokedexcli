@@ -19,15 +19,18 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop() {
-	ticker := time.NewTicker(c.Interval)
+	ticker := time.NewTicker(c.interval)
 	for range ticker.C {
-		c.mutex.Lock()
-		defer c.mutex.Unlock()
-		for key, entry := range c.cache {
-			t := <-ticker.C
-			if entry.createdAt.Before(t) {
-				delete(c.cache, key)
-			}
+		c.reap()
+	}
+}
+
+func (c *Cache) reap() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	for key, entry := range c.cache {
+		if entry.createdAt.Before(time.Now().UTC().Add(-c.interval)) {
+			delete(c.cache, key)
 		}
 	}
 }

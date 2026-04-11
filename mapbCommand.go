@@ -1,36 +1,15 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/SamuelAboelkhir/pokedexcli/internal/pokeapi"
-)
+import "fmt"
 
 func mapbCommand(config *Config) error {
 	if config.prev == nil {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	locations := pokeapi.Locations{}
-
-	data, ok := config.cache.Get(*config.prev)
-	if ok {
-		err := json.Unmarshal(data, &locations)
-		if err != nil {
-			return err
-		}
-	} else {
-		apiData, err := config.pokeapiClient.GetLocations(config.prev)
-		if err != nil {
-			return err
-		}
-		data, err := json.Marshal(apiData)
-		if err != nil {
-			return err
-		}
-		config.cache.Add(*config.prev, data)
-		locations = apiData
+	locations, err := config.pokeapiClient.GetLocations(config.prev)
+	if err != nil {
+		return err
 	}
 	for _, location := range locations.Results {
 		fmt.Println(location.Name)
