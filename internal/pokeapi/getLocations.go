@@ -6,8 +6,12 @@ import (
 	"net/http"
 )
 
-func (c *Client) GetLocations(URL *string) (Locations, error) {
-	url := baseUrl
+func (c *Client) GetLocations(URL, name *string) (Locations, error) {
+	url := baseUrl + locationAreaPath
+
+	if name != nil {
+		url = url + "/" + *name
+	}
 
 	if URL != nil {
 		url = *URL

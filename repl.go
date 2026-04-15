@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func startRepl(config *Config) {
+func startRepl(config *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -19,9 +19,13 @@ func startRepl(config *Config) {
 		}
 
 		command, ok := getCommands()[words[0]]
+		var name *string
+		if len(words) > 1 {
+			name = &words[1]
+		}
 
 		if ok {
-			err := command.callback(config)
+			err := command.callback(config, name)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -54,6 +58,16 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Shows the previous 20 locations were pokemon are located. Continues to go back 20 locations at a time when recalled",
 			callback:    mapbCommand,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Shows all the pokemon that are available in an area. Must provide area name",
+			callback:    exploreCommand,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempts to catch a pokemon. Must provided pokemon name",
+			callback:    catchCommand,
 		},
 	}
 }
