@@ -23,6 +23,7 @@ func catchCommand(config *config, name *string) error {
 	if catchChance > pokemon.BaseExperience {
 		fmt.Println(pokemon.Name, "was caught!")
 		config.pokedex[pokemon.Name] = pokemon
+		fmt.Println(pokemon.Name, "You may now inspect it with the inspect command")
 	} else {
 		fmt.Println(pokemon.Name, "escaped!")
 	}
